@@ -1,97 +1,95 @@
 [
     {
-        "key": "key1",
+        "id": "key1",
         "name": "Product NO.",
         "parent": null,
         "order": 1,
         "type": "data",
-        "iconCls":"icon-my2",
-        "des": "这是字段描述"
+        "des": "这是字段描述",
+        "editor": "text"
     },
     {
-        "key": "key2",
+        "id": "key2",
         "name": "Product",
         "parent": null,
         "order": 2,
         "type": "data",
-        "iconCls":"icon-my2",
-        "des": "这是字段描述"
+        "des": "这是字段描述",
+        "editor": "text"
     },
     {
-        "key": "key8",
+        "id": "key8",
         "name": "Item Details",
         "parent": null,
         "order": 8,
         "type": "merge",
         "des": "这是字段描述",
-        "iconCls":"icon-my1",
         "children": [
             {
-                "key": "key3",
+                "id": "key3",
                 "name": "Unit Cost",
                 "parent": "key8",
                 "order": 3,
-                "iconCls":"icon-my2",
                 "type": "data",
-                "des": "这是字段描述"
+                "des": "这是字段描述",
+                "editor": "text"
             },
             {
-                "key": "key4",
+                "id": "key4",
                 "name": "AttributeStatus",
                 "parent": "key8",
                 "order": 4,
                 "type": "data",
-                "iconCls":"icon-my2",
-                "des": "这是字段描述"
+                "des": "这是字段描述",
+                "editor": "text"
             }
         ]
     },
     {
-        "key": "key9",
+        "id": "key9",
         "name": "Item Details2",
         "parent": null,
         "order": 9,
         "type": "merge",
         "des": "这是字段描述",
-        "iconCls":"icon-my1",
+        "editor": "text",
         "children": [
             {
-                "key": "key5",
+                "id": "key5",
                 "name": "List Price",
                 "parent": "key8",
                 "order": 5,
                 "type": "data",
-                "iconCls":"icon-my2",
-                "des": "这是字段描述"
+                "des": "这是字段描述",
+                "editor": "text"
             },
             {
-                "key": "key6",
+                "id": "key6",
                 "name": "Attribute",
                 "parent": "key8",
                 "order": 6,
-                "iconCls":"icon-my2",
                 "type": "data",
-                "des": "这是字段描述"
+                "des": "这是字段描述",
+                "editor": "text"
             }
         ]
     },
     {
-        "key": "key7",
+        "id": "key7",
         "name": "Item Id",
         "parent": "key8",
         "order": 7,
         "type": "data",
         "des": "这是字段描述",
-        "iconCls":"icon-my2"
-
+        "editor": "text"
     },
     {
-        "key": "key10",
+        "id": "key10",
         "name": "空的",
         "parent": null,
         "order": 7,
         "type": "merge",
         "des": "这是字段描述",
-        "iconCls":"icon-my1"
+        "editor": "text"
     }
 ]

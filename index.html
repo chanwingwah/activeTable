@@ -13,56 +13,190 @@
 
 </head>
 
-<body>
+<body style="padding: 20px">
     <div style="margin:20px 0;"></div>
     <div id="editcolumn">
-        <div style="margin:20px 0;"></div>
-        <table title="Folder Browser" class="easyui-treegrid" style="width:800px;height:auto"
-               data-options="
-                url: 'json/head.json',
-                method: 'get',
-                iconCls: 'icon-ok',
-                rownumbers: true,
-                idField: 'key',
-                treeField: 'name',
-                onBeforeCollapse: function () {return false}
-                 ">
+        <div style="margin:20px 0;">
+            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="edit()">Edit</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="save()">Save</a>
+            <a href="javascript:void(0)" class="easyui-linkbutton" onclick="cancel()">Cancel</a>
+        </div>
+        <table id="tg" class="easyui-treegrid" title="Editable TreeGrid" style="width:800px;height:auto" data-options="
+                        iconCls: 'icon-ok',
+                        rownumbers: true,
+                        animate: true,
+                        collapsible: true,
+                        fitColumns: true,
+                        data:columndata,
+                        idField: 'id',
+                        treeField: 'name',
+                        onBeforeCollapse: function () {return false},
+                    ">
             <thead>
                 <tr>
-                    <th data-options="field:'name'" width="220">表头名</th>
-                    <th data-options="field:'type'" width="100">特性</th>
-                    <th data-options="field:'des'" width="348">描述</th>
-                    <th data-options="field:'type'" width="200">操作</th>
+                    <th data-options="field:'name',editor:'text'" width="220">表头名</th>
+                    <th data-options="field:'type',formatter:formatType,editor:'text'" width="100">特性</th>
+                    <th data-options="field:'des',editor:'text'" width="348">描述</th>
+                    <th data-options="field:'editor',editor:editorCombo" width="100">编辑类型</th>
                 </tr>
             </thead>
         </table>
+        <div style="margin:20px 0;"></div>
     </div>
 
     <div style="margin:20px 0;"></div>
     <table id="table" title="DataGrid with Toolbar" style="width:800px;height:auto">
     </table>
     <script src="index.js"></script>
-    <script>
 
-        // $('#editcolumn').panel({
-        //     width: 800,
-        //     height: 150,
-        //     title: '表头配置',
-        //     tools: [{
-        //         iconCls: 'icon-add',
-        //         handler: function () { alert('new') }
-        //     }, {
-        //         iconCls: 'icon-save',
-        //         handler: function () { alert('save') }
-        //     }]
-        // });
-        // $('#editcolumn').panel('panel').toggle();
+    <script type="text/javascript">
+        function formatProgress(value) {
+            if (value) {
+                var s = '<div style="width:100%;border:1px solid #ccc">' +
+                    '<div style="width:' + value + '%;background:#cc0000;color:#fff">' + value + '%' + '</div>'
+                '</div>';
+                return s;
+            } else {
+                return '';
+            }
+        }
 
-        // var columnConfig;
-        // $.get('json/head.json', function (data) {
-        //     // 生成表头，然后初始化表格
-        //     columnConfig = data;
-        // });
+        var editingId;
+
+        function edit() {
+            if (editingId != undefined) {
+                $('#tg').treegrid('select', editingId);
+                return;
+            }
+            var row = $('#tg').treegrid('getSelected');
+            if (row) {
+                editingId = row.id
+                $('#tg').treegrid('beginEdit', editingId);
+            }
+        }
+
+        function save() {
+            if (editingId != undefined) {
+                var t = $('#tg');
+                t.treegrid('endEdit', editingId);
+                editingId = undefined;
+                localStorage.setItem("columns", JSON.stringify(columndata));
+                
+                // var persons = 0;
+                // var rows = t.treegrid('getChildren');
+                // for (var i = 0; i < rows.length; i++) {
+                //     var p = parseInt(rows[i].persons);
+                //     if (!isNaN(p)) {
+                //         persons += p;
+                //     }
+                // }
+                // var frow = t.treegrid('getFooterRows')[0];
+                // frow.persons = persons;
+                // t.treegrid('reloadFooter');
+            }
+        }
+
+        function cancel() {
+            if (editingId != undefined) {
+                $('#tg').treegrid('cancelEdit', editingId);
+                editingId = undefined;
+            }
+        }
+
+        function formatType(value, row, index) {
+            if (value === "merge") {
+                value = '合并列';
+            } else {
+                value = '数据列';
+            }
+            return value;
+        }
+        var editorCombo = {
+            type: 'combobox',
+            options: {
+                valueField: 'label',
+                textField: 'value',
+                data: [{
+                    label: '不可编辑',
+                    value: ''
+                }, {
+                    label: 'text',
+                    value: 'text'
+                }, {
+                    label: 'textarea',
+                    value: 'textarea'
+                }, {
+                    label: 'datebox',
+                    value: 'datebox'
+                }, {
+                    label: 'numberbox',
+                    value: 'numberbox'
+                }]
+            }
+        }
+        // var editingId;
+        var toolbar2 = [{
+            text: '新增',
+            iconCls: 'icon-add',
+            handler: function () {
+                alert('add')
+            }
+        }, {
+            text: '删除',
+            iconCls: 'icon-remove',
+            handler: function () {
+                alert('cut')
+            }
+        }, '-', {
+            text: '编辑',
+            iconCls: 'icon-edit',
+            handler: function () {
+                if (editingId != undefined) {
+                    $('#editcolumn').treegrid('select', editingId);
+                    return;
+                }
+                var row = $('#editcolumn').treegrid('getSelected');
+                // var row = $('#editcolumn').treegrid('getSelected');
+                if (row) {
+                    editingId = row.id
+                    $('#editcolumn').treegrid('beginEdit', editingId);
+                }
+            }
+        }, '-', {
+            text: '保存',
+            iconCls: 'icon-save',
+            handler: function () {
+                // $('#editcolumn').toggle();
+            }
+        }, '-', {
+            text: '取消',
+            iconCls: 'icon-cancel',
+            handler: function () {
+                // $('#editcolumn').toggle();
+            }
+        }];
+        // $(function () {
+        var columndata;
+        if (localStorage.getItem('columns')) {
+            columndata = JSON.parse(localStorage.getItem('columns'));
+            // $('#mycolumn').treegrid({
+            //     data: data,
+            //     toolbar: toolbar2
+            // })
+        } else {
+            $.get('json/head.json', function (data2) {
+                // 生成表头，然后初始化表格
+                addIcon(data2);
+                localStorage.setItem("columns", JSON.stringify(data2));
+                columndata = data2;
+                // $('#mycolumn').treegrid({
+                //     data: columndata,
+                //     toolbar: toolbar2
+                // })
+
+            })
+        }
+        // })
         // 定义界面初始化和column编辑界面
         // 1. 增加列
         // 2. 增加子列
@@ -83,8 +217,8 @@
             //视图和页面紧密联系
             /*
              *config{slector，columns} 
-            */
-            var ColumnConfig = function (config) { }
+             */
+            var ColumnConfig = function (config) {}
 
             // 1、渲染
             ColumnConfig.prototype.init = function (config) {
@@ -128,7 +262,6 @@
                 this.input = $(config.id);
                 console.log(config);
                 _bind(this);
-
                 return this;
             };
 
@@ -147,8 +280,6 @@
             return TextCountFun;
 
         })();
-
-
     </script>
 </body>
 

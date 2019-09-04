@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Loading nested subgrid data - jQuery EasyUI Demo</title>
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/default/easyui.css">
+    <link rel="stylesheet" type="text/css" href="https://www.jeasyui.com/easyui/themes/icon.css">
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/jquery.easyui.min.js"></script>
+    <script type="text/javascript" src="https://www.jeasyui.com/easyui/datagrid-detailview.js"></script>
+</head>
+<body>
+    <h2>Loading nested subgrid data</h2>
+    <p>Click the expand button to expand row and view subgrid.</p>
+    
+    <table id="dg"></table>
+    <script type="text/javascript">
+        var conf = {
+            options:{
+                fitColumns:true,
+                columns:[[
+                    {field:'company',title:'Company Name',width:200},
+                    {field:'contact',title:'Contact Name',width:200},
+                    {field:'country',title:'Country',width:200}
+                ]],
+                data:[
+                    {company:'Speed Info',contact:'Minna John',country:'Sweden'},
+                    {company:'Speed Info2',contact:'Minna John2',country:'Sweden2'}
+                ]
+            },
+            subgrid:{
+                options:{
+                    fitColumns:true,
+                    foreignField:'companyid',
+                    columns:[[
+                        {field:'orderdate',title:'Order Date',width:200},
+                        {field:'shippeddate',title:'Shipped Date',width:200},
+                        {field:'freight',title:'Freight',width:200}
+                    ]],
+                    data:[
+                        {orderdate:'08/23/2012',shippeddate:'12/25/2012',freight:9734}
+                    ]
+                },
+            }
+        };
+ 
+        $(function(){
+            $('#dg').datagrid({
+                title:'DataGrid - Nested SubGrid',
+                width:700,
+                height:300
+            }).datagrid('subgrid', conf);
+        });
+    </script>

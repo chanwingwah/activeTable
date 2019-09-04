@@ -1,0 +1,34 @@
+[
+    {
+        "key": "key1",
+        "name": "Product NO.",
+        "parentKey": null,
+        "type": "data",
+        "order":1,
+        "des": "这是字段描述"
+    },
+    {
+        "key": "key2",
+        "name": "XXXXX",
+        "parentKey": null,
+        "type": "data"
+    },
+    {
+        "key": "key3",
+        "name": "XXXXX",
+        "parentKey": "key8",
+        "type": "merge"
+    },
+    {
+        "key": "key4",
+        "name": "XXXXX",
+        "parentKey": "key8",
+        "type": "merge"
+    },
+    {
+        "key": "key8",
+        "name": "XXXXX",
+        "parentKey": null,
+        "type": "merge"
+    }
+]

@@ -28,8 +28,7 @@ var toolbar = [{
             $.messager.confirm('确认', tips, function (r) {
                 if (r) {
                     $('#tg').treegrid('cancelEdit', editingId)
-                        .datagrid('deleteRow', editingId);
-               
+                        .treegrid('deleteRow', editingId);
                     // 同步到远程
                     localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
 
@@ -59,8 +58,27 @@ var toolbar = [{
     handler: function () {
         if (editingId != undefined) {
             // 保存需要校验，值不为空
-            var val1 = $('#tg').treegrid('getEditor', { id: editingId, field: 'name' }).target[0].value
-            var val2 = $('#tg').treegrid('getEditor', { id: editingId, field: 'des' }).target[0].value
+            var val1 = $('#tg').treegrid('getEditor', {
+                id: editingId,
+                field: 'name'
+            }).target[0];
+            var val2 = $('#tg').treegrid('getEditor', {
+                id: editingId,
+                field: 'des'
+            }).target[0];
+            if (!val1.value) {
+                $.messager.alert('警告', '表头名不允许是空值', null, function () {
+                    val1.focus();
+                });
+                return;
+            }
+            if (!val2.value) {
+                $.messager.alert('警告', '请添加描述', null, function () {
+                    val2.focus();
+                });
+
+                return;
+            }
             // console.log(val1,val2,val3)
             var t = $('#tg');
             t.treegrid('endEdit', editingId);
@@ -87,15 +105,6 @@ var toolbar = [{
     }
 }];
 
-// function formatType(value, row, index) {
-//     if (value === "merge") {
-//         value = '合并列';
-//     } else {
-//         value = '数据列';
-//     }
-//     return value;
-// }
-
 function editFormatter(value, row, index) {
     if (value == null) {
         return "";
@@ -103,14 +112,13 @@ function editFormatter(value, row, index) {
     return value;
 }
 
-
-
 var editorCombo = {
     type: 'combobox',
     options: {
         valueField: 'value',
         textField: 'label',
-        editable:false,
+        editable: false,
+        panelHeight: 'auto',
         data: [{
             label: '不编辑（空）',
             value: null
@@ -137,7 +145,7 @@ editorCombo.options.data.forEach(function (val, index) {
 
 var editorCombo2 = {
     type: 'combobox',
-    editable:false,
+    editable: false,
     options: {
         valueField: 'value',
         textField: 'label',
@@ -167,6 +175,7 @@ function addIcon(data) {
     }
 }
 
+//  右键菜单
 function onContextMenu(e, row) {
     if (row) {
         e.preventDefault();
@@ -190,10 +199,13 @@ function onContextMenu(e, row) {
     }
 }
 
+
+//  设置新ID递增
 if (!localStorage.getItem('idCount')) {
     localStorage.setItem('idCount', 100);
 }
 
+//  添加
 function append(root, type) {
     var _root = root || false;
     var _type = type || "data";
@@ -209,21 +221,22 @@ function append(root, type) {
 
         var pid;
         if (_root) {
-            pid = undefined;
+            pid = null;
         } else {
             var node = $('#tg').treegrid('getSelected');
             if (node) {
                 pid = node.id;
             }
         }
-
         //  创建逻辑 , 先页面上创建并且生成列，进入编辑状态， 假如取消，就是不创建，保存的话，就完成与数据库更新并且利用返回的Id来替换
         //  保存需要进行数据校验
         $('#tg').treegrid('append', {
             parent: pid,
             data: [{
                 id: idIndex,
-                name: 'New Task' + idIndex,
+                parent: pid,
+                name: 'New Key' + idIndex,
+                des: 'New des' + idIndex,
                 type: _type,
                 editor: _type === 'data' ? 'text' : null,
                 iconCls: _type === 'data' ? 'icon-my2' : 'icon-my1',
@@ -236,8 +249,8 @@ function append(root, type) {
             .treegrid('beginEdit', editingId);
         editingNew = true;
     }
-
 }
+//  删除
 function removeIt() {
     var node = $('#tg').treegrid('getSelected');
     if (node) {
@@ -246,19 +259,124 @@ function removeIt() {
         localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
     }
 }
-function collapse() {
-    var node = $('#tg').treegrid('getSelected');
-    if (node) {
-        $('#tg').treegrid('collapse', node.id);
-    }
+
+// 获取组列表
+function getGroups() {
+    var allColumn = JSON.parse(localStorage.getItem('columns'));
+    var groupArray = allColumn.filter(function (item, index) {
+        if (item.type === 'merge') {
+            return true;
+        }
+    })
+    console.log('groupArray', groupArray);
+    return groupArray;
 }
-function expand() {
+
+
+function popInset() {
+    if (editingId != undefined) {
+        $.messager.alert('警告', '请先取消或保存编辑的操作');
+        return false;
+    }
     var node = $('#tg').treegrid('getSelected');
     if (node) {
-        $('#tg').treegrid('expand', node.id);
+        console.log(node);
+        var after = node.parent;
+        var data = $('#tg').treegrid('pop', node.id);
+        data.parent = null;
+        console.log(after, data)
+        $('#tg').treegrid('insert', {
+            after: after,
+            data: data
+        });
+        // 同步到远程
+        localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
     }
 }
 
+function moveToGroup() {
+    if (editingId != undefined) {
+        $.messager.alert('警告', '请先取消或保存编辑的操作');
+        return false;
+    }
+    var node = $('#tg').treegrid('getSelected');
+    var groupArray = getGroups();
+    $('#cc').combobox({
+        data: groupArray,
+        editable: false,
+        onSelect: function () {
+            $('#btnOK').linkbutton('enable');
+        }
+    });
+    $('#btnOK').linkbutton('disable');
+    $('#w').window({
+        title: '请选择[' + node.name + ']添加到的组'
+    }).window('open');
+}
+
+function confirmToGroup() {
+    // pop,然后插入，假如parent与插入一致，不操作
+    var node = $('#tg').treegrid('getSelected');
+    var select = $('#cc').combobox('getValue');
+    console.log(select);
+    if (select !== node.parent) {
+        var data = $('#tg').treegrid('pop', node.id);
+        console.log('data', data)
+        data.parent = null;
+        var dataArr = [];
+        dataArr.push(data);
+        $('#tg').treegrid('append', {
+            parent: select,
+            data: dataArr
+        });
+        // 同步到远程
+        localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
+    }
+    $('#w').window('close');
+}
+
+function moveColumn(direction) {
+    if (editingId != undefined) {
+        $.messager.alert('警告', '请先取消或保存编辑的操作');
+        return false;
+    }
+    var node = $('#tg').treegrid('getSelected');
+    console.log(node)
+    // 寻找前和后
+    var dataArr;
+    if (node.parent) {
+        dataArr = $('#tg').treegrid('getParent', node.id).children;
+    } else {
+        dataArr = $('#tg').treegrid('getData');
+    }
+
+    var targetId;
+    // 获取目标节点
+    dataArr.some(function (item, index, arr) {
+        if (item.id === node.id) {
+            var max = direction == "up" ? 0 : arr.length - 1;
+            var targetindex = direction == "up" ? index - 1 : index + 1;
+            if (index === max) {
+                targetId = null;
+            } else {
+                targetId = arr[targetindex].id;
+            }
+            return true;
+        }
+    });
+    if (targetId) {
+        var params = {
+            data: $('#tg').treegrid('pop', node.id)
+        }
+        params[direction == "up" ? 'before' : 'after'] = targetId
+        $('#tg').treegrid('insert', params);
+
+        // 同步到远程
+        localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
+    } else {
+        $.messager.alert('提示', '已无法' + (direction == "up" ? '向上' : '往下') + '移');
+    }
+}
 
 var columndata;
 if (localStorage.getItem('columns')) {
@@ -278,7 +396,5 @@ if (localStorage.getItem('columns')) {
             data: columndata,
             toolbar: toolbar
         })
-
     })
 }
-

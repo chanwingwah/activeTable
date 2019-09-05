@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Loading nested subgrid data - jQuery EasyUI Demo</title>
+    <link rel="stylesheet" href="jquery-easyui-1.8.5/themes/default/easyui.css">
+    <link rel="stylesheet" href="jquery-easyui-1.8.5/themes/icon.css">
+    <script src="jquery-easyui-1.8.5/jquery.min.js"></script>
+    <script src="jquery-easyui-1.8.5/jquery.easyui.min.js"></script>
+</head>
+
+<body>
+    <h2>TreeGrid ContextMenu</h2>
+    <p>Right click to display the context menu.</p>
+    <div style="margin:20px 0;"></div>
+    <table id="tg" class="easyui-treegrid" title="TreeGrid ContextMenu" style="width:800px;height:auto"
+           data-options="
+                    iconCls: 'icon-ok',
+                    rownumbers: true,
+                    animate: true,
+                    collapsible: true,
+                    fitColumns: true,
+                    idField: 'id',
+                    treeField: 'name',
+                    onContextMenu: onContextMenu,
+                    onBeforeCollapse: function () {return false}
+                ">
+        <thead>
+            <tr>
+                <th data-options="field:'name',editor:{ type: 'text',options: { maxlenth: 10}}" width="220">表头名</th>
+                <th data-options="field:'des',editor:'text'" width="458">描述</th>
+                <th data-options="field:'editor',editor:editorCombo, formatter:editFormatter" width="100">编辑类型</th>
+            </tr>
+        </thead>
+    </table>
+    <div id="mm" class="easyui-menu" style="width:120px;">
+        <div onclick="append(false)()" data-options="iconCls:'icon-add'">添加子列</div>
+    </div>
+    <div id="mm2" class="easyui-menu" style="width:120px;">
+        <div onclick="removeIt()" data-options="iconCls:'icon-add'">移动到合并列</div>
+    </div>
+    <div id="mm3" class="easyui-menu" style="width:120px;">
+        <div onclick="removeIt()" data-options="iconCls:'icon-add'">移动其他合并列</div>
+        <div class="menu-sep"></div>
+        <div onclick="" data-options="iconCls:'icon-edit'">移出合并列</div>
+    </div>
+    <script src="editColumn.js"></script>
+</body>
+
+</html>

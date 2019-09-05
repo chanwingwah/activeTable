@@ -30,7 +30,7 @@ function initColumn(data) {
     var column2 = [];
     for (var i = 0; i < data.length; i++) {
         if (data[i].type === "merge") {
-            if (data[i].children && data[i].children.length) {
+            if (data[i].children && data[i].children.length>0) {
                 // 2、二维第一
                 column1.push({
                     title: data[i].name,
@@ -44,14 +44,12 @@ function initColumn(data) {
                     })
                 }
             }
-
         } else {
             // 1、只有一维
             column1.push({
                 field: data[i].id,
                 title: data[i].name,
                 rowspan: 2
-
             })
         }
     }
@@ -63,6 +61,7 @@ function initColumn(data) {
         return [column1, column2];
     }
 }
+
 
 // 遍历 增加图标
 function addIcon(data) {
@@ -94,12 +93,13 @@ if (localStorage.getItem("columns")) {
         method: 'get',
         toolbar: toolbar
     });
+    console.log(tableHead)
 } else {
 
     $.get('json/head.json', function (data) {
         // 生成表头，然后初始化表格
         addIcon(data);
-        localStorage.setItem("columns", JSON.stringify(data));
+        // localStorage.setItem("columns", JSON.stringify(data));
         var tableHead = initColumn(data);
         setTimeout(function () {
             $('#table').datagrid({

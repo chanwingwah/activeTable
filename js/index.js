@@ -84,39 +84,64 @@ $(function () {
     function initColumn(data) {
         var column1 = [];
         var column2 = [];
-        for (var i = 0; i < data.length; i++) {
-            if (data[i].type === "merge") {
-                if (data[i].children && data[i].children.length > 0) {
-                    // 2、二维第一
-                    column1.push({
-                        title: data[i].name,
-                        colspan: data[i].children.length
-                    })
-                    // 3、二维第二
-                    for (var j = 0; j < data[i].children.length; j++) {
-                        column2.push({
-                            field: data[i].children[j].id,
-                            title: data[i].children[j].name,
-                            editor: data[i].children[j].editor,
-                        })
-                    }
+
+        // 检查是否只有一维
+        var ifNotSingle = data.some(function (item, index, arr) {
+            if (item.type === 'merge') {
+                if (item.children && item.children.length > 0) {
+                    return true;
                 }
-            } else {
-                // 1、只有一维
-                column1.push({
-                    field: data[i].id,
-                    title: data[i].name,
-                    editor: data[i].editor,
-                    rowspan: 2
-                })
             }
-        }
-        if (column1.length === 0) {
-            return [];
-        } else if (column2.length === 0) {
+        })
+
+        if (!ifNotSingle) {
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].type === "data") {
+                    // 1、只有一维
+                    column1.push({
+                        field: data[i].id,
+                        title: data[i].name,
+                        editor: data[i].editor,
+                    })
+                }
+            }
             return [column1];
         } else {
-            return [column1, column2];
+            for (var i = 0; i < data.length; i++) {
+                if (data[i].type === "merge") {
+                    if (data[i].children && data[i].children.length > 0) {
+                        // 2、二维第一
+                        column1.push({
+                            title: data[i].name,
+                            colspan: data[i].children.length
+                        })
+                        // 3、二维第二
+                        for (var j = 0; j < data[i].children.length; j++) {
+                            column2.push({
+                                field: data[i].children[j].id,
+                                title: data[i].children[j].name,
+                                editor: data[i].children[j].editor,
+                            })
+                        }
+                    }
+                } else {
+                    // 1、只有一维
+                    column1.push({
+                        field: data[i].id,
+                        title: data[i].name,
+                        editor: data[i].editor,
+                        rowspan: 2
+                    })
+                }
+            }
+
+            if (column1.length === 0) {
+                return [];
+            } else if (column2.length === 0) {
+                return [column1];
+            } else {
+                return [column1, column2];
+            }
         }
     }
 

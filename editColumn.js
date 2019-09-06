@@ -1,163 +1,119 @@
+
 var editingId;
 var editingNew = false;
-var toolbar = [{
-    text: '新增',
-    iconCls: 'icon-add',
-    handler: append(true)
-}, {
-    text: '新增组合列',
-    iconCls: 'icon-add',
-    handler: append(true, 'merge')
-}, {
-    text: '删除',
-    iconCls: 'icon-remove',
-    handler: function () {
-        if (editingId != undefined) {
-            $.messager.alert('警告', '请先取消或保存编辑的操作');
-            return false;
-        }
-        // if (editingId == null) {
-        var row = $('#tg').treegrid('getSelected');
-        if (row) {
-            editingId = row.id;
-            var tips = row.type === 'data' ? '您确认想要删除这个列吗？该列的数据会同时删除，无法撤回' : '您确认想要删除这个组合列吗？该组合列下的列以及数据会同时删除，无法撤回'
-        }
-        // }
-        if (editingId != undefined) {
 
-            $.messager.confirm('确认', tips, function (r) {
-                if (r) {
+//  设置新ID递增
+if (!localStorage.getItem('idCount')) {
+    localStorage.setItem('idCount', 100);
+}
+
+
+// 定义工具栏
+var toolbar = [
+    {
+        text: '新增',
+        iconCls: 'icon-add',
+        handler: append(true)
+    }, {
+        text: '新增组合列',
+        iconCls: 'icon-add',
+        handler: append(true, 'merge')
+    }, {
+        text: '删除',
+        iconCls: 'icon-remove',
+        handler: function () {
+            if (editingId != undefined) {
+                $.messager.alert('警告', '请先取消或保存编辑的操作');
+                return false;
+            }
+            // if (editingId == null) {
+            var row = $('#tg').treegrid('getSelected');
+            if (row) {
+                editingId = row.id;
+                var tips = row.type === 'data' ? '您确认想要删除这个列吗？该列的数据会同时删除，无法撤回' : '您确认想要删除这个组合列吗？该组合列下的列以及数据会同时删除，无法撤回'
+            }
+            // }
+            if (editingId != undefined) {
+
+                $.messager.confirm('确认', tips, function (r) {
+                    if (r) {
+                        $('#tg').treegrid('cancelEdit', editingId)
+                            .treegrid('deleteRow', editingId);
+                        // 同步到远程
+                        localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
+
+                    }
+                    editingId = undefined;
+                });
+                return;
+            }
+        }
+    }, '-', {
+        text: '编辑',
+        iconCls: 'icon-edit',
+        handler: function () {
+            if (editingId != undefined) {
+                $('#tg').treegrid('select', editingId);
+                return;
+            }
+            var row = $('#tg').treegrid('getSelected');
+            if (row) {
+                editingId = row.id
+                $('#tg').treegrid('beginEdit', editingId);
+            }
+        }
+    }, '-', {
+        text: '保存',
+        iconCls: 'icon-save',
+        handler: function () {
+            if (editingId != undefined) {
+                // 保存需要校验，值不为空
+                var val1 = $('#tg').treegrid('getEditor', {
+                    id: editingId,
+                    field: 'name'
+                }).target[0];
+                var val2 = $('#tg').treegrid('getEditor', {
+                    id: editingId,
+                    field: 'des'
+                }).target[0];
+                if (!val1.value) {
+                    $.messager.alert('警告', '表头名不允许是空值', null, function () {
+                        val1.focus();
+                    });
+                    return;
+                }
+                if (!val2.value) {
+                    $.messager.alert('警告', '请添加描述', null, function () {
+                        val2.focus();
+                    });
+
+                    return;
+                }
+                // console.log(val1,val2,val3)
+                var t = $('#tg');
+                t.treegrid('endEdit', editingId);
+                editingId = undefined;
+                editingNew = false;
+                // 同步到远程
+                localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
+            }
+        }
+    }, '-', {
+        text: '取消',
+        iconCls: 'icon-cancel',
+        handler: function () {
+            if (editingId != undefined) {
+                $('#tg').treegrid('cancelEdit', editingId);
+                // 假如是在新增的过程中取消，删除该行
+                if (editingNew) {
                     $('#tg').treegrid('cancelEdit', editingId)
-                        .treegrid('deleteRow', editingId);
-                    // 同步到远程
-                    localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
-
+                        .datagrid('deleteRow', editingId);
+                    editingNew = false;
                 }
                 editingId = undefined;
-            });
-            return;
-        }
-    }
-}, '-', {
-    text: '编辑',
-    iconCls: 'icon-edit',
-    handler: function () {
-        if (editingId != undefined) {
-            $('#tg').treegrid('select', editingId);
-            return;
-        }
-        var row = $('#tg').treegrid('getSelected');
-        if (row) {
-            editingId = row.id
-            $('#tg').treegrid('beginEdit', editingId);
-        }
-    }
-}, '-', {
-    text: '保存',
-    iconCls: 'icon-save',
-    handler: function () {
-        if (editingId != undefined) {
-            // 保存需要校验，值不为空
-            var val1 = $('#tg').treegrid('getEditor', {
-                id: editingId,
-                field: 'name'
-            }).target[0];
-            var val2 = $('#tg').treegrid('getEditor', {
-                id: editingId,
-                field: 'des'
-            }).target[0];
-            if (!val1.value) {
-                $.messager.alert('警告', '表头名不允许是空值', null, function () {
-                    val1.focus();
-                });
-                return;
             }
-            if (!val2.value) {
-                $.messager.alert('警告', '请添加描述', null, function () {
-                    val2.focus();
-                });
-
-                return;
-            }
-            // console.log(val1,val2,val3)
-            var t = $('#tg');
-            t.treegrid('endEdit', editingId);
-            editingId = undefined;
-            editingNew = false;
-            // 同步到远程
-            localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
         }
-    }
-}, '-', {
-    text: '取消',
-    iconCls: 'icon-cancel',
-    handler: function () {
-        if (editingId != undefined) {
-            $('#tg').treegrid('cancelEdit', editingId);
-            // 假如是在新增的过程中取消，删除该行
-            if (editingNew) {
-                $('#tg').treegrid('cancelEdit', editingId)
-                    .datagrid('deleteRow', editingId);
-                editingNew = false;
-            }
-            editingId = undefined;
-        }
-    }
-}];
-
-function editFormatter(value, row, index) {
-    if (value == null) {
-        return "";
-    }
-    return value;
-}
-
-var editorCombo = {
-    type: 'combobox',
-    options: {
-        valueField: 'value',
-        textField: 'label',
-        editable: false,
-        panelHeight: 'auto',
-        data: [{
-            label: '不编辑（空）',
-            value: null
-        }, {
-            label: 'text',
-            value: 'text'
-        }, {
-            label: 'textarea',
-            value: 'textarea'
-        }, {
-            label: 'datebox',
-            value: 'datebox'
-        }, {
-            label: 'numberbox',
-            value: 'numberbox'
-        }]
-    }
-};
-
-var mappingObj = [];
-editorCombo.options.data.forEach(function (val, index) {
-    mappingObj.push(val.value)
-})
-
-var editorCombo2 = {
-    type: 'combobox',
-    editable: false,
-    options: {
-        valueField: 'value',
-        textField: 'label',
-        data: [{
-            label: '数据列',
-            value: 'data'
-        }, {
-            label: '合并列',
-            value: 'merge'
-        }]
-    }
-}
+    }];
 
 // 遍历 增加图标
 function addIcon(data) {
@@ -173,36 +129,6 @@ function addIcon(data) {
             data[i].iconCls = 'icon-my2';
         }
     }
-}
-
-//  右键菜单
-function onContextMenu(e, row) {
-    if (row) {
-        e.preventDefault();
-        $(this).treegrid('select', row.id);
-        if (row.type === 'merge') {
-            $('#mm').menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
-        } else if (row.parent == null) {
-            $('#mm2').menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
-        } else {
-            $('#mm3').menu('show', {
-                left: e.pageX,
-                top: e.pageY
-            });
-        }
-    }
-}
-
-
-//  设置新ID递增
-if (!localStorage.getItem('idCount')) {
-    localStorage.setItem('idCount', 100);
 }
 
 //  添加
@@ -250,6 +176,7 @@ function append(root, type) {
         editingNew = true;
     }
 }
+
 //  删除
 function removeIt() {
     var node = $('#tg').treegrid('getSelected');
@@ -272,7 +199,7 @@ function getGroups() {
     return groupArray;
 }
 
-
+// 从一个组移动到另外的组
 function popInset() {
     if (editingId != undefined) {
         $.messager.alert('警告', '请先取消或保存编辑的操作');
@@ -294,6 +221,7 @@ function popInset() {
     }
 }
 
+// 移动到组
 function moveToGroup() {
     if (editingId != undefined) {
         $.messager.alert('警告', '请先取消或保存编辑的操作');
@@ -314,6 +242,7 @@ function moveToGroup() {
     }).window('open');
 }
 
+// 确认移动
 function confirmToGroup() {
     // pop,然后插入，假如parent与插入一致，不操作
     var node = $('#tg').treegrid('getSelected');
@@ -321,13 +250,11 @@ function confirmToGroup() {
     console.log(select);
     if (select !== node.parent) {
         var data = $('#tg').treegrid('pop', node.id);
-        console.log('data', data)
-        data.parent = null;
-        var dataArr = [];
-        dataArr.push(data);
+        // console.log('data', data)
+        data.parent = select;
         $('#tg').treegrid('append', {
             parent: select,
-            data: dataArr
+            data: [data]
         });
         // 同步到远程
         localStorage.setItem('columns', JSON.stringify($('#tg').treegrid('getData')));
@@ -335,6 +262,7 @@ function confirmToGroup() {
     $('#w').window('close');
 }
 
+// 移动操作
 function moveColumn(direction) {
     if (editingId != undefined) {
         $.messager.alert('警告', '请先取消或保存编辑的操作');
@@ -378,23 +306,98 @@ function moveColumn(direction) {
     }
 }
 
-var columndata;
-if (localStorage.getItem('columns')) {
-    columndata = JSON.parse(localStorage.getItem('columns'));
+// 表格初始化
+function datagridInit(columndata) {
     $('#tg').treegrid({
         data: columndata,
         toolbar: toolbar,
+        rownumbers: true,
+        animate: true,
+        collapsible: true,
+        fitColumns: true,
+        idField: 'id',
+        treeField: 'name',
+        onContextMenu: onContextMenu,
+        onBeforeCollapse: function () { return false },
+        columns: [[
+            { field: 'name', editor: { type: 'text', options: {} }, width: '28%', title: '表头名' },
+            { field: 'des', editor: { type: 'text', options: {} }, width: '58%', title: '描述' },
+            { field: 'editor', editor: editorCombo, formatter: editFormatter, width: '14%', title: '编辑类型' },
+        ]]
     })
+}
+
+
+//  右键菜单
+function onContextMenu(e, row) {
+    if (row) {
+        e.preventDefault();
+        $(this).treegrid('select', row.id);
+        if (row.type === 'merge') {
+            $('#mm').menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        } else if (row.parent == null) {
+            $('#mm2').menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        } else {
+            $('#mm3').menu('show', {
+                left: e.pageX,
+                top: e.pageY
+            });
+        }
+    }
+}
+
+// 字段格式化
+function editFormatter(value, row, index) {
+    if (value == null) {
+        return "";
+    }
+    return value;
+}
+
+// 编辑器配置
+var editorCombo = {
+    type: 'combobox',
+    options: {
+        valueField: 'value',
+        textField: 'label',
+        editable: false,
+        panelHeight: 'auto',
+        data: [{
+            label: '不编辑（空）',
+            value: null
+        }, {
+            label: 'text',
+            value: 'text'
+        }, {
+            label: 'textarea',
+            value: 'textarea'
+        }, {
+            label: 'datebox',
+            value: 'datebox'
+        }, {
+            label: 'numberbox',
+            value: 'numberbox'
+        }]
+    }
+};
+
+// 进行表格初始化
+if (localStorage.getItem('columns')) {
+    datagridInit(JSON.parse(localStorage.getItem('columns')));
 } else {
     $.get('json/head.json', function (data2) {
         // 生成表头，然后初始化表格
         addIcon(data2);
         localStorage.setItem("columns", JSON.stringify(data2));
-        columndata = data2;
-        console.log(columndata)
-        $('#tg').treegrid({
-            data: columndata,
-            toolbar: toolbar
-        })
+        datagridInit(data2);
+
     })
 }
+
+

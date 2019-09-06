@@ -52,12 +52,11 @@
         "order": 9,
         "type": "merge",
         "des": "这是字段描述",
-        "editor": "text",
         "children": [
             {
                 "id": "key5",
                 "name": "List Price",
-                "parent": "key8",
+                "parent": "key9",
                 "order": 5,
                 "type": "data",
                 "des": "这是字段描述",
@@ -66,7 +65,7 @@
             {
                 "id": "key6",
                 "name": "Attribute",
-                "parent": "key8",
+                "parent": "key9",
                 "order": 6,
                 "type": "data",
                 "des": "这是字段描述",
@@ -77,7 +76,7 @@
     {
         "id": "key7",
         "name": "Item Id",
-        "parent": "key8",
+        "parent": null,
         "order": 7,
         "type": "data",
         "des": "这是字段描述",
@@ -85,12 +84,12 @@
     },
     {
         "id": "key10",
-        "name": "空的",
+        "name": "Empty Group",
         "parent": null,
         "order": 7,
         "type": "merge",
         "des": "这是字段描述",
-        "editor": "text"
+        "editor": null
     }
    
 ]

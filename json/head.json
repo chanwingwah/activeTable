@@ -5,7 +5,7 @@
         "parent": null,
         "order": 1,
         "type": "data",
-        "des": "这是字段描述",
+        "des": "右键可以更多操作",
         "editor": "text"
     },
     {

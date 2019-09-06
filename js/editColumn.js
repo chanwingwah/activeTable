@@ -113,6 +113,12 @@ var toolbar = [
                 editingId = undefined;
             }
         }
+    }, '-', {
+        text: '查看数据表',
+        // iconCls: '',
+        handler: function () {
+           window.open('index.html');
+        }
     }];
 
 // 遍历 增加图标

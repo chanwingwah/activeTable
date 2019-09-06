@@ -16,36 +16,42 @@
     <div class="easyui-panel" style="position:relative;width:800px;border: none" data-options="border:false">
         <table id="tg" class="easyui-treegrid" style="width:800px;height:auto" data-options=" ">
         </table>
-
-        <div id="w" class="easyui-window"
+        <div id="w" 
             data-options="closed:true,modal:true,minimizable:false,collapsible:false,maximizable:false"
             style="width:350px;height:100px;padding:10px">
-            <div style="display: flex; justify-content: space-around">
-                <input id="cc" data-options="valueField:'id',textField:'name',width:200,panelHeight:'auto'">
-                <a href="javascript:;" class="easyui-linkbutton" id="btnOK" iconCls="icon-ok"
-                    onclick="confirmToGroup()">确认</a>
-            </div>
         </div>
     </div>
-    <div id="mm" class="easyui-menu" style="width:120px;">
+    <div id="mm" class="easyui-menu"  style="width:120px;" >
         <div onclick="append(false)()" data-options="iconCls:'icon-add'">添加子列</div>
         <div class="menu-sep"></div>
         <div onclick="moveColumn('up')" data-options="iconCls:'icon-up'">上移</div>
         <div onclick="moveColumn('down')" data-options="iconCls:'icon-down'">下移</div>
+        <div class="menu-sep"></div>
+        <div onclick="addAfter('data','before')" data-options="iconCls:'icon-add'">从前面新增列</div>
+        <div onclick="addAfter('data','after')" data-options="iconCls:'icon-add'">从后面新增列</div>
+        <div onclick="addAfter('merge','before')" data-options="iconCls:'icon-add'">从前面新增组合列</div>
+        <div onclick="addAfter('merge','after')" data-options="iconCls:'icon-add'">从后面新增组合列</div>
     </div>
     <div id="mm2" class="easyui-menu" style="width:120px;">
         <div onclick="moveToGroup()" data-options="iconCls:'icon-in'">移动到合并列</div>
         <div class="menu-sep"></div>
         <div onclick="moveColumn('up')" data-options="iconCls:'icon-up'">上移</div>
         <div onclick="moveColumn('down')" data-options="iconCls:'icon-down'">下移</div>
+        <div class="menu-sep"></div>
+        <div onclick="addAfter('data','before')" data-options="iconCls:'icon-add'">从前面新增列</div>
+        <div onclick="addAfter('data','after')" data-options="iconCls:'icon-add'">从后面新增列</div>
+        <div onclick="addAfter('merge','before')" data-options="iconCls:'icon-add'">从前面新增组合列</div>
+        <div onclick="addAfter('merge','after')" data-options="iconCls:'icon-add'">从后面新增组合列</div>
     </div>
     <div id="mm3" class="easyui-menu" style="width:120px;">
         <div onclick="moveToGroup()" data-options="iconCls:'icon-in'">移动到其他合并列</div>
-        <div class="menu-sep"></div>
         <div onclick="popInset()" data-options="iconCls:'icon-out'">移出合并列</div>
         <div class="menu-sep"></div>
         <div onclick="moveColumn('up')" data-options="iconCls:'icon-up'">上移</div>
         <div onclick="moveColumn('down')" data-options="iconCls:'icon-down'">下移</div>
+        <div class="menu-sep"></div>
+        <div onclick="addAfter('data','before')" data-options="iconCls:'icon-add'">从前面新增列</div>
+        <div onclick="addAfter('data','after')" data-options="iconCls:'icon-add'">从后面新增列</div>
     </div>
     <script src="js/editColumn.js"></script>
 </body>

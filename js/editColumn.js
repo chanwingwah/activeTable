@@ -7,7 +7,6 @@ if (!localStorage.getItem('idCount')) {
     localStorage.setItem('idCount', 100);
 }
 
-
 // 定义工具栏
 var toolbar = [
     {
@@ -117,7 +116,7 @@ var toolbar = [
         text: '查看数据表',
         // iconCls: '',
         handler: function () {
-           window.open('index.html');
+            window.open('index.html');
         }
     }];
 
@@ -143,13 +142,14 @@ function append(root, type) {
     var _type = type || "data";
     return function () {
 
-        var idIndex = parseInt(localStorage.getItem('idCount'));
-        localStorage.setItem('idCount', idIndex + 1);
-        idIndex = 'key' + idIndex;
         if (editingId != undefined) {
             $.messager.alert('警告', '请先取消或保存编辑的操作');
             return false;
         };
+
+        var idIndex = parseInt(localStorage.getItem('idCount'));
+        localStorage.setItem('idCount', idIndex + 1);
+        idIndex = 'key' + idIndex;
 
         var pid;
         if (_root) {
@@ -176,7 +176,6 @@ function append(root, type) {
             }]
         });
         editingId = idIndex;
-        console.log(editingId);
         $('#tg').treegrid('selectRow', editingId)
             .treegrid('beginEdit', editingId);
         editingNew = true;
@@ -234,17 +233,20 @@ function moveToGroup() {
         return false;
     }
     var node = $('#tg').treegrid('getSelected');
-    var groupArray = getGroups();
-    $('#cc').combobox({
-        data: groupArray,
-        editable: false,
-        onSelect: function () {
-            $('#btnOK').linkbutton('enable');
-        }
-    });
-    $('#btnOK').linkbutton('disable');
     $('#w').window({
-        title: '请选择[' + node.name + ']添加到的组'
+        title: '请选择[' + node.name + ']添加到的组',
+        href: 'component/window.html',
+        onLoad: function () {
+            $('#cc').combobox({
+                data: getGroups(),
+                editable: false,
+                onSelect: function () {
+                    $('#btnOK').linkbutton('enable');
+                }
+            });
+
+            $('#btnOK').linkbutton('disable');
+        }
     }).window('open');
 }
 
@@ -268,7 +270,7 @@ function confirmToGroup() {
     $('#w').window('close');
 }
 
-// 移动操作
+// 上下移动操作
 function moveColumn(direction) {
     if (editingId != undefined) {
         $.messager.alert('警告', '请先取消或保存编辑的操作');
@@ -312,6 +314,40 @@ function moveColumn(direction) {
     }
 }
 
+// 从后面添加
+function addAfter(type, direction) {
+    if (editingId != undefined) {
+        $.messager.alert('警告', '请先取消或保存编辑的操作');
+        return false;
+    };
+    var node = $('#tg').treegrid('getSelected');
+    if (node) {
+        var idIndex = parseInt(localStorage.getItem('idCount'));
+        localStorage.setItem('idCount', idIndex + 1);
+        idIndex = 'key' + idIndex;
+        pid = node.parent;
+        var params = {
+            data: {
+                id: idIndex,
+                parent: pid,
+                name: 'New Key' + idIndex,
+                des: 'New des' + idIndex,
+                type: type,
+                editor: type === 'data' ? 'text' : null,
+                iconCls: type === 'data' ? 'icon-my2' : 'icon-my1',
+            }
+        }
+
+        params[direction] = node.id;
+        $('#tg').treegrid('insert',params);
+
+        editingId = idIndex;
+        $('#tg').treegrid('selectRow', editingId)
+            .treegrid('beginEdit', editingId);
+        editingNew = true;
+    }
+}
+
 // 表格初始化
 function datagridInit(columndata) {
     $('#tg').treegrid({
@@ -332,6 +368,16 @@ function datagridInit(columndata) {
         ]]
     })
 }
+
+
+// // 初始化菜单 
+//  function menuinnit() {
+
+//     $('#mm').menu({    
+
+//     });  
+//  }
+
 
 
 //  右键菜单
